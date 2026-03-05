@@ -1,0 +1,66 @@
+.resume-preview {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    background: #ffffff;
+    padding: 1rem;
+}
+
+.resume-name {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.contact-line {
+    margin: 0.35rem 0 0 0;
+    color: #3e3e3c;
+}
+
+.resume-section {
+    margin-top: 1rem;
+}
+
+.section-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 700;
+    border-bottom: 1px solid #d8dde6;
+    padding-bottom: 0.2rem;
+}
+
+.entry + .entry {
+    margin-top: 0.6rem;
+}
+
+.item-title {
+    margin: 0;
+    font-weight: 600;
+}
+
+.item-subtitle {
+    margin: 0.1rem 0 0 0;
+    color: #706e6b;
+}
+
+.item-body {
+    margin: 0.2rem 0 0 0;
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.skill-chip {
+    border: 1px solid #d8dde6;
+    border-radius: 999px;
+    padding: 0.12rem 0.6rem;
+    background: #f3f6f9;
+    font-size: 0.8rem;
+}
+
+.empty-state {
+    margin-top: 1rem;
+    color: #706e6b;
+}

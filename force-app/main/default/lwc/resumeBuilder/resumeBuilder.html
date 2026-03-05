@@ -1,0 +1,88 @@
+<template>
+    <c-personal-info onupdated={handlePersonalInfoUpdated}></c-personal-info>
+    <c-summary-componet onupdatedsummary={handleSummaryUpdated}></c-summary-componet>
+    <c-work-experiance onupdatework={handleWorkUpdated}></c-work-experiance>
+    <c-education-detaile-component onupdateedu={handleEducationUpdated}></c-education-detaile-component>
+    <c-skills-components onupdatedskills={handleSkillsUpdated}></c-skills-components>
+    <template if:true={hasAnySection}>
+        <lightning-card title="Resume Preview" icon-name="custom:custom63">
+            <div class="slds-p-around_medium">
+                <div class="resume-preview">
+                    <template if:true={hasPersonalName}>
+                        <h1 class="resume-name">{personalInfo.fullName}</h1>
+                    </template>
+                    <template if:true={hasContactInfo}>
+                        <p class="contact-line">{formattedContactInfo}</p>
+                    </template>
+
+                    <template if:true={hasSummary}>
+                        <section class="resume-section">
+                            <h2 class="section-title">Summary</h2>
+                            <p class="item-body">{summaryText}</p>
+                        </section>
+                    </template>
+
+                    <template if:true={hasSkills}>
+                        <section class="resume-section">
+                            <h2 class="section-title">Skills</h2>
+                            <div class="skills-list">
+                                <template for:each={filteredSkills} for:item="skill">
+                                    <span key={skill.id} class="skill-chip">{skill.name}</span>
+                                </template>
+                            </div>
+                        </section>
+                    </template>
+
+                    <template if:true={hasWorkExperience}>
+                        <section class="resume-section">
+                            <h2 class="section-title">Work Experience</h2>
+                            <template for:each={workExperienceForView} for:item="work">
+                                <div key={work.id} class="entry">
+                                    <template if:true={work.displayTitle}>
+                                        <p class="item-title">{work.displayTitle}</p>
+                                    </template>
+                                    <template if:true={work.locationDateLine}>
+                                        <p class="item-subtitle">{work.locationDateLine}</p>
+                                    </template>
+                                    <template for:each={work.responsibilityLines} for:item="responsibility">
+                                        <p key={responsibility.id} class="item-body">- {responsibility.text}</p>
+                                    </template>
+                                </div>
+                            </template>
+                        </section>
+                    </template>
+
+                    <template if:true={hasEducation}>
+                        <section class="resume-section">
+                            <h2 class="section-title">Education</h2>
+                            <template for:each={filteredEducation} for:item="education">
+                                <div key={education.id} class="entry">
+                                    <template if:true={education.degree}>
+                                        <p class="item-title">{education.degree}</p>
+                                    </template>
+                                    <template if:true={education.institution}>
+                                        <p class="item-subtitle">{education.institution}</p>
+                                    </template>
+                                    <template if:true={education.year}>
+                                        <p class="item-body">Year: {education.year}</p>
+                                    </template>
+                                </div>
+                            </template>
+                        </section>
+                    </template>
+
+                </div>
+            </div>
+            <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+                <lightning-button
+                    label="Create & Download PDF"
+                    variant="brand"
+                    onclick={downloadPdf}>
+                </lightning-button>
+            </div>
+        </lightning-card>
+    </template>
+    <template if:false={hasAnySection}>
+        <p class="empty-state">Fill at least one section to preview and download your resume.</p>
+    </template>
+</template>
