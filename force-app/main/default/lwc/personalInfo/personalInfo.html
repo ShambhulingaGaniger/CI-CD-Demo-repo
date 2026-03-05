@@ -1,0 +1,12 @@
+<template>
+    <lightning-card title="Personal Information" icon-name="custom:custom63">
+         <div class="slds-p-horizontal_medium">      
+         <lightning-input type="text" label="Full Name" data-field="fullName" onchange={handleInput}></lightning-input>
+         <!-- <lightning-input type="text" label="Last Name"  ></lightning-input> -->
+         <lightning-input type="email" label="Email Address" data-field="emailAddress" onchange={handleInput}></lightning-input>
+         <lightning-input type="tel" label="Phone Number" data-field="phoneNumber" onchange={handleInput}></lightning-input>
+         <lightning-input type="text" label="Address" data-field="address" onchange={handleInput}></lightning-input>
+        </div>
+    </lightning-card>
+        
+</template>

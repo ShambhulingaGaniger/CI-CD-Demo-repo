@@ -1,0 +1,64 @@
+<template>
+    <lightning-card title="Work Experience" icon-name="custom:custom63">
+        <template for:each={workExperience} for:item="work" for:index="index">
+            <div class="slds-p-horizontal_medium" key={work.id}>
+                <lightning-input
+                    type="text"
+                    label="Job Title"
+                    value={work.jobTitle}
+                    data-field="jobTitle"
+                    data-index={index}
+                    onchange={handleChange}>
+                </lightning-input>
+                <lightning-input
+                    type="text"
+                    label="Company Name"
+                    value={work.companyName}
+                    data-field="companyName"
+                    data-index={index}
+                    onchange={handleChange}>
+                </lightning-input>
+                <lightning-input
+                    type="text"
+                    label="Location"
+                    value={work.location}
+                    data-field="location"
+                    data-index={index}
+                    onchange={handleChange}>
+                </lightning-input>
+                <lightning-input
+                    type="date"
+                    label="Start Date"
+                    value={work.startDate}
+                    data-field="startDate"
+                    data-index={index}
+                    onchange={handleChange}>
+                </lightning-input>
+                <lightning-input
+                    type="date"
+                    label="End Date"
+                    value={work.endDate}
+                    data-field="endDate"
+                    data-index={index}
+                    onchange={handleChange}>
+                </lightning-input>
+                <lightning-textarea
+                    label="Responsibilities / Achievements (one per line)"
+                    value={work.responsibilities}
+                    data-field="responsibilities"
+                    data-index={index}
+                    onchange={handleChange}>
+                </lightning-textarea>
+            </div>
+        </template>
+
+        <div class="slds-p-horizontal_medium slds-m-top_small slds-m-bottom_small">
+            <lightning-button
+                variant="brand-outlined"
+                type="button"
+                label="Add Work Experience"
+                onclick={addWorkExperience}>
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>
