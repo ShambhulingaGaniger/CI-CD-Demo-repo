@@ -1,0 +1,13 @@
+<template>
+    <lightning-button class="slds-button slds-button_brand" label="show/hide" slot="action" onclick={handleClick}>Brand Button</lightning-button>
+    <template if:true={showCard}>
+    <lightning-card title="Card Title" icon-name="standard:account">
+        <lightning-button  label="New" ></lightning-button>
+        <p class="slds-p-horizontal_medium">
+            This is the body 
+        </p>
+        <p slot="footer"> card footer</p>
+        </lightning-card>
+        <lightning-input></lightning-input>
+        </template>
+</template>
