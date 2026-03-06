@@ -31,8 +31,12 @@ jobs:
             --client-id ${{ secrets.SF_CONSUMER_KEY }} \
             --alias qaOrg
 
-      - name: Deploy to QA Org
-        run: sf project deploy start --target-org qaOrg
+      - name: Deploy and Run Apex Tests
+        run: |
+          sf project deploy start \
+          --target-org qaOrg \
+          --test-level RunLocalTests \
+          --wait 20
 
 
 # ---------------- PRODUCTION DEPLOYMENT ----------------
@@ -57,5 +61,9 @@ jobs:
             --client-id ${{ secrets.SF_CONSUMER_FOR_ORC_KEY }} \
             --alias prodOrg
 
-      - name: Deploy to Production Org
-        run: sf project deploy start --target-org prodOrg
+      - name: Deploy to Production with Tests
+        run: |
+          sf project deploy start \
+          --target-org prodOrg \
+          --test-level RunLocalTests \
+          --wait 20
