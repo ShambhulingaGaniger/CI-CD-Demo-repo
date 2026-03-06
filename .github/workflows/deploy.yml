@@ -67,6 +67,67 @@
 #           --target-org prodOrg \
 #           --test-level RunLocalTests \
 #           --wait 20
+# name: Salesforce CI/CD
+
+# on:
+#   push:
+#     branches:
+#       - QA
+#       - main
+
+# jobs:
+
+# # ---------------- QA DEPLOYMENT ----------------
+
+#   deploy-qa:
+#     if: github.ref == 'refs/heads/QA'
+#     runs-on: ubuntu-latest
+#     environment: deploy-approval
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v3
+
+#       - name: Install Salesforce CLI
+#         run: npm install -g @salesforce/cli
+
+#       - name: Authenticate QA Org
+#         run: |
+#           echo "${{ secrets.SF_JWT_KEY }}" > server.key
+#           sf org login jwt \
+#             --username ${{ secrets.SF_ORGB_USERNAME }} \
+#             --jwt-key-file server.key \
+#             --client-id ${{ secrets.SF_CONSUMER_KEY }} \
+#             --alias qaOrg
+
+#       - name: Deploy to QA Org
+#         run: sf project deploy start --target-org qaOrg
+
+
+# # ---------------- PRODUCTION DEPLOYMENT ----------------
+
+#   deploy-prod:
+#     if: github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v3
+
+#       - name: Install Salesforce CLI
+#         run: npm install -g @salesforce/cli
+
+#       - name: Authenticate Production Org
+#         run: |
+#           echo "${{ secrets.SF_JWT_KEY }}" > server.key
+#           sf org login jwt \
+#             --username ${{ secrets.SF_ORGC_USERNAME }} \
+#             --jwt-key-file server.key \
+#             --client-id ${{ secrets.SF_CONSUMER_FOR_ORC_KEY }} \
+#             --alias prodOrg
+
+#       - name: Deploy to Production Org
+#         run: sf project deploy start --target-org prodOrg
 name: Salesforce CI/CD
 
 on:
@@ -87,9 +148,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Install Salesforce CLI
         run: npm install -g @salesforce/cli
+
+      - name: Install Delta Plugin
+        run: echo y | sf plugins install sfdx-git-delta
 
       - name: Authenticate QA Org
         run: |
@@ -100,8 +166,22 @@ jobs:
             --client-id ${{ secrets.SF_CONSUMER_KEY }} \
             --alias qaOrg
 
-      - name: Deploy to QA Org
-        run: sf project deploy start --target-org qaOrg
+      - name: Generate Delta Package
+        run: |
+          mkdir delta
+          sf sgd source delta \
+            --to HEAD \
+            --from HEAD~1 \
+            --output delta/ \
+            --generate-delta
+
+      - name: Deploy Delta to QA Org
+        run: |
+          sf project deploy start \
+            --manifest delta/package/package.xml \
+            --target-org qaOrg \
+            --test-level RunLocalTests \
+            --wait 60
 
 
 # ---------------- PRODUCTION DEPLOYMENT ----------------
@@ -113,9 +193,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Install Salesforce CLI
         run: npm install -g @salesforce/cli
+
+      - name: Install Delta Plugin
+        run: echo y | sf plugins install sfdx-git-delta
 
       - name: Authenticate Production Org
         run: |
@@ -126,5 +211,19 @@ jobs:
             --client-id ${{ secrets.SF_CONSUMER_FOR_ORC_KEY }} \
             --alias prodOrg
 
-      - name: Deploy to Production Org
-        run: sf project deploy start --target-org prodOrg
+      - name: Generate Delta Package
+        run: |
+          mkdir delta
+          sf sgd source delta \
+            --to HEAD \
+            --from HEAD~1 \
+            --output delta/ \
+            --generate-delta
+
+      - name: Deploy Delta to Production Org
+        run: |
+          sf project deploy start \
+            --manifest delta/package/package.xml \
+            --target-org prodOrg \
+            --test-level RunLocalTests \
+            --wait 60
