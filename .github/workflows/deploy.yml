@@ -128,6 +128,106 @@
 
 #       - name: Deploy to Production Org
 #         run: sf project deploy start --target-org prodOrg
+
+# in this one we added Delta deployment
+# name: Salesforce CI/CD
+
+# on:
+#   push:
+#     branches:
+#       - QA
+#       - main
+
+# jobs:
+
+# # ---------------- QA DEPLOYMENT ----------------
+
+#   deploy-qa:
+#     if: github.ref == 'refs/heads/QA'
+#     runs-on: ubuntu-latest
+#     environment: deploy-approval
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+
+#       - name: Install Salesforce CLI
+#         run: npm install -g @salesforce/cli
+
+#       - name: Install Delta Plugin
+#         run: echo y | sf plugins install sfdx-git-delta
+
+#       - name: Authenticate QA Org
+#         run: |
+#           echo "${{ secrets.SF_JWT_KEY }}" > server.key
+#           sf org login jwt \
+#             --username ${{ secrets.SF_ORGB_USERNAME }} \
+#             --jwt-key-file server.key \
+#             --client-id ${{ secrets.SF_CONSUMER_KEY }} \
+#             --alias qaOrg
+
+#       - name: Generate Delta Package
+#         run: |
+#           mkdir delta
+#           sf sgd source delta \
+#             --to HEAD \
+#             --from HEAD~1 \
+#             --output delta/ \
+#             --generate-delta
+
+#       - name: Deploy Delta to QA Org
+#         run: |
+#           sf project deploy start \
+#             --manifest delta/package/package.xml \
+#             --target-org qaOrg
+
+
+# # ---------------- PRODUCTION DEPLOYMENT ----------------
+
+#   deploy-prod:
+#     if: github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+
+#       - name: Install Salesforce CLI
+#         run: npm install -g @salesforce/cli
+
+#       - name: Install Delta Plugin
+#         run: echo y | sf plugins install sfdx-git-delta
+
+#       - name: Authenticate Production Org
+#         run: |
+#           echo "${{ secrets.SF_JWT_KEY }}" > server.key
+#           sf org login jwt \
+#             --username ${{ secrets.SF_ORGC_USERNAME }} \
+#             --jwt-key-file server.key \
+#             --client-id ${{ secrets.SF_CONSUMER_FOR_ORC_KEY }} \
+#             --alias prodOrg
+
+#       - name: Generate Delta Package
+#         run: |
+#           mkdir delta
+#           sf sgd source delta \
+#             --to HEAD \
+#             --from HEAD~1 \
+#             --output delta/ \
+#             --generate-delta
+
+#       - name: Deploy Delta to Production Org
+#         run: |
+#           sf project deploy start \
+#             --manifest delta/package/package.xml \
+#             --target-org prodOrg
+
+# added a Email notification to CI/CD pipeline so think this one 
+
 name: Salesforce CI/CD
 
 on:
@@ -181,6 +281,50 @@ jobs:
             --manifest delta/package/package.xml \
             --target-org qaOrg
 
+      # -------- Email Notification (Success) --------
+
+      - name: Send Success Email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ QA Deployment Successful"
+          body: |
+            Salesforce QA Deployment Completed Successfully.
+
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Workflow: ${{ github.workflow }}
+            Triggered By: ${{ github.actor }}
+
+          to: ${{ secrets.EMAIL_TO }}
+          from: GitHub CI/CD
+
+      # -------- Email Notification (Failure) --------
+
+      - name: Send Failure Email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ QA Deployment Failed"
+          body: |
+            Salesforce QA Deployment Failed.
+
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Workflow: ${{ github.workflow }}
+
+            Please check GitHub Actions logs.
+          to: ${{ secrets.EMAIL_TO }}
+          from: GitHub CI/CD
+
 
 # ---------------- PRODUCTION DEPLOYMENT ----------------
 
@@ -223,3 +367,47 @@ jobs:
           sf project deploy start \
             --manifest delta/package/package.xml \
             --target-org prodOrg
+
+      # -------- Email Notification (Success) --------
+
+      - name: Send Success Email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ Production Deployment Successful"
+          body: |
+            Salesforce Production Deployment Completed Successfully.
+
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Workflow: ${{ github.workflow }}
+            Triggered By: ${{ github.actor }}
+
+          to: ${{ secrets.EMAIL_TO }}
+          from: GitHub CI/CD
+
+      # -------- Email Notification (Failure) --------
+
+      - name: Send Failure Email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Production Deployment Failed"
+          body: |
+            Salesforce Production Deployment Failed.
+
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Workflow: ${{ github.workflow }}
+
+            Please check GitHub Actions logs.
+          to: ${{ secrets.EMAIL_TO }}
+          from: GitHub CI/CD
