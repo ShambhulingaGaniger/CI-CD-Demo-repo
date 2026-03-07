@@ -22,30 +22,22 @@ pipeline {
                 ]) {
 
                     bat """
-                    sf org login jwt --client-id %CLIENT_ID% --jwt-key-file %JWT_KEY% --username %SF_USERNAME% --alias devhub
+                    sf org login jwt --client-id %CLIENT_ID% --jwt-key-file %JWT_KEY% --username %SF_USERNAME% --alias targetOrg
                     """
 
                 }
             }
         }
 
-        stage('Create Scratch Org') {
+        stage('Deploy Apex Code') {
             when {
                 branch 'main'
             }
 
             steps {
-                bat "sf org create scratch --definition-file project-scratch-def.json --alias testscratch --duration-days 7 --target-dev-hub devhub"
-            }
-        }
-
-        stage('Deploy Metadata') {
-            when {
-                branch 'main'
-            }
-
-            steps {
-                bat "sf project deploy start"
+                bat """
+                sf project deploy start --target-org targetOrg
+                """
             }
         }
 
