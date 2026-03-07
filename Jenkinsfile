@@ -35,7 +35,7 @@ pipeline {
             }
 
             steps {
-                bat "sf org create scratch --definition-file project-scratch-def.json --alias testscratch --duration-days 7"
+                bat "sf org create scratch --definition-file project-scratch-def.json --alias testscratch --duration-days 7 --target-dev-hub devhub"
             }
         }
 
